@@ -64,7 +64,7 @@ python build.py
 
 ### macOS/Linux 环境
 
-⚠️ **注意**: 当前系统为 macOS，无法直接生成 Windows exe 文件。
+⚠️ **注意**: OS X及Linux环境无法直接生成 Windows exe 文件。
 
 有以下解决方案：
 
@@ -77,7 +77,7 @@ python build.py
    - 复杂度较高，不推荐
 
 3. **使用虚拟机**
-   - 在 macOS 上运行 Windows 虚拟机
+   - 在前述系统上运行 Windows 虚拟机
    - 在虚拟机中执行构建
 
 ---
