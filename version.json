@@ -1,0 +1,15 @@
+{
+  "version": "1.2.3",
+  "release_date": "2026-03-04",
+  "changes": [
+    "修复：doc_comparator 类定义缩进错误导致无法启动",
+    "修复：页眉页脚提取 AttributeError（'_Header' object has no attribute 'text'）",
+    "优化：详细改动列表中位置显示改为「第 X 段」更直观",
+    "优化：关于对话框增加「玉哥与他的虾」署名",
+    "优化：版本号从 version.json 动态读取",
+    "清理：删除开发阶段临时测试文件和无用文档"
+  ],
+  "download_url": "https://github.com/your-repo/contract-diff/releases/latest",
+  "min_python_version": "3.10",
+  "release_notes": "v1.2.3 修复多个关键 bug，优化用户体验，清理项目冗余文件。建议所有用户升级。"
+}
