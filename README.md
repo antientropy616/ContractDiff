@@ -62,9 +62,9 @@ python build.py
 # - ~/Documents/合同对比助手.exe
 ```
 
-### macOS/Linux 环境
+### macOS/Linux 环境建议直接去macOS的branch
 
-⚠️ **注意**: 当前系统为 macOS，无法直接生成 Windows exe 文件。
+⚠️ **注意**: 当系统为 macOS，无法直接生成 Windows exe 文件。
 
 有以下解决方案：
 
@@ -159,7 +159,7 @@ python build.py
 
 日志文件按天存储，位置：
 - Windows: `C:\Users\用户名\Documents\合同对比助手\logs\`
-- macOS: `/Users/用户名/Documents/合同对比助手/logs/`
+
 
 ### 运行测试
 
