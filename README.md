@@ -3,6 +3,8 @@
 
 一款专业的合同文档差异对比工具，专为法律工作场景设计。
 
+**支持平台：** Windows 10/11、macOS 10.15+
+
 ---
 
 ## 📋 功能特点
@@ -62,23 +64,37 @@ python build.py
 # - ~/Documents/合同对比助手.exe
 ```
 
-### macOS/Linux 环境
+### macOS 环境
 
-⚠️ **注意**: 当前系统为 macOS，无法直接生成 Windows exe 文件。
+```bash
+# 安装依赖
+pip install -r requirements.txt
 
-有以下解决方案：
+# 执行构建（生成 .app）
+python build_mac.py
 
-1. **在 Windows 电脑上构建**
-   - 将整个项目文件夹复制到 Windows 电脑
-   - 运行 `python build.py`
+# 生成的 App 位于：
+# - dist/合同对比助手.app
+# - ~/Documents/合同对比助手.app
+```
 
-2. **使用交叉编译工具**
-   - 需要配置 Wine 环境
-   - 复杂度较高，不推荐
+**首次运行提示：**
+macOS 可能会提示"无法打开，因为来自身份不明的开发者"
 
-3. **使用虚拟机**
-   - 在 macOS 上运行 Windows 虚拟机
-   - 在虚拟机中执行构建
+解决方法：
+1. 打开"系统偏好设置" → "安全性与隐私"
+2. 点击"仍要打开"
+3. 之后就可以正常打开了
+
+### Linux 环境
+
+```bash
+# 安装依赖
+pip install -r requirements.txt
+
+# 执行构建（需要自行修改构建脚本）
+python build.py
+```
 
 ---
 
@@ -108,13 +124,13 @@ python build.py
 
 ## 💻 系统要求
 
-| 项目 | 要求 |
-|------|------|
-| 操作系统 | Windows 10/11 |
-| Python | 3.10+ (源码运行时) |
-| 内存 | 最低 2GB，推荐 4GB+ |
-| 磁盘空间 | 100MB |
-| Office | 可选（用于查看结果） |
+| 项目 | Windows | macOS |
+|------|---------|-------|
+| 操作系统 | Windows 10/11 | macOS 10.15+ |
+| Python | 3.10+ | 3.10+ |
+| 内存 | 最低 2GB，推荐 4GB+ | 最低 2GB，推荐 4GB+ |
+| 磁盘空间 | 100MB | 100MB |
+| Office | 可选（用于查看结果） | 可选（用于查看结果） |
 
 ---
 
