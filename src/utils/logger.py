@@ -30,9 +30,11 @@ class Logger:
         self.logger = logging.getLogger('ContractDiff')
         self.logger.setLevel(logging.DEBUG)
         
-        # 创建日志目录
+        # 创建日志目录（跨平台兼容）
         log_dir = os.path.join(os.path.expanduser("~"), "Documents", "合同对比助手", "logs")
         os.makedirs(log_dir, exist_ok=True)
+        logger_instance = logging.getLogger('ContractDiff')
+        logger_instance.info(f"日志目录：{log_dir}")
         
         # 日志文件路径
         log_file = os.path.join(log_dir, f"contrast_{datetime.now().strftime('%Y%m%d')}.log")

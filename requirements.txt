@@ -2,7 +2,7 @@
 # Contract Diff Tool - Requirements
 
 # GUI 框架
-PyQt6>=6.4.0
+PyQt6>=6.4.0,<6.10.0
 
 # Word 文档处理
 python-docx>=0.8.11
@@ -25,3 +25,8 @@ pyinstaller>=5.0
 
 # 测试框架（开发用）
 pytest>=7.0.0
+
+# 以下库已被移除以精简体积：
+# opencv-python-headless - 不需要（46MB）
+# numpy - 不需要（15MB）
+# PyMuPDF - 不需要（30MB）

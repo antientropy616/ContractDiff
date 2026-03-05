@@ -18,22 +18,29 @@ def get_version():
     """从 version.json 读取版本号"""
     try:
         # 尝试多个可能的路径
-        for base in [os.path.dirname(sys.argv[0]), os.path.dirname(os.path.abspath(__file__))]:
-            version_file = os.path.join(base, 'version.json')
+        paths_to_try = []
+        
+        # 当前脚本所在目录
+        if hasattr(sys, '_MEIPASS'):
+            paths_to_try.append(os.path.join(sys._MEIPASS, 'version.json'))
+        
+        paths_to_try.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'version.json'))
+        paths_to_try.append(os.path.join(os.path.dirname(__file__), '..', 'version.json'))
+        paths_to_try.append(os.path.join(os.getcwd(), 'version.json'))
+        
+        for version_file in paths_to_try:
             if os.path.exists(version_file):
                 with open(version_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                    return data.get('version', '1.0')
-            # 检查是否在打包后的环境中
-            if hasattr(sys, '_MEIPASS'):
-                version_file = os.path.join(sys._MEIPASS, 'version.json')
-                if os.path.exists(version_file):
-                    with open(version_file, 'r', encoding='utf-8') as f:
-                        data = json.load(f)
-                        return data.get('version', '1.0')
-    except Exception:
-        pass
-    return '1.0'
+                    version = data.get('version', '1.0.0')
+                    print(f"✅ 读取版本号：{version} (from {version_file})")
+                    return version
+        
+        print("⚠️ 未找到 version.json，使用默认版本号 1.0.0")
+    except Exception as e:
+        print(f"⚠️ 读取 version.json 失败：{e}")
+    
+    return '1.0.0'
 
 
 VERSION = get_version()
@@ -114,9 +121,16 @@ def main():
         app.setApplicationVersion(VERSION)
         app.setOrganizationName("ContractDiffTool")
         
-        # 设置全局字体
+        # 设置全局字体（跨平台兼容）
         print("设置字体...")
-        font = QFont("Microsoft YaHei", 10)
+        import platform
+        system = platform.system()
+        if system == "Darwin":  # macOS
+            font = QFont("PingFang SC", 10)
+        elif system == "Windows":
+            font = QFont("Microsoft YaHei", 10)
+        else:  # Linux 等其他系统
+            font = QFont("WenQuanYi Micro Hei", 10)
         app.setFont(font)
         
         # 创建主窗口

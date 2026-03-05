@@ -7,6 +7,7 @@
 
 import os
 import sys
+import platform
 from datetime import datetime
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -16,6 +17,17 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtGui import QFont, QAction
+
+
+def get_system_font():
+    """获取系统字体（跨平台兼容）"""
+    system = platform.system()
+    if system == "Darwin":  # macOS
+        return "PingFang SC"
+    elif system == "Windows":
+        return "Microsoft YaHei"
+    else:  # Linux 等其他系统
+        return "WenQuanYi Micro Hei"
 
 from core.doc_comparator import DocumentComparator
 from utils.styles import STYLESHEET
@@ -108,15 +120,16 @@ class ChangelogDialog(QDialog):
         layout = QVBoxLayout(self)
         
         # 标题
+        font_name = get_system_font()
         title = QLabel("合同对比助手 - 版本更新日志")
-        title.setFont(QFont("Microsoft YaHei", 14, QFont.Weight.Bold))
+        title.setFont(QFont(font_name, 14, QFont.Weight.Bold))
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
         
         # 更新日志文本框
         self.text_edit = QTextEdit()
         self.text_edit.setReadOnly(True)
-        self.text_edit.setFont(QFont("Microsoft YaHei", 10))
+        self.text_edit.setFont(QFont(font_name, 10))
         layout.addWidget(self.text_edit)
         
         # 加载更新日志
@@ -217,9 +230,10 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(save_group)
         
         # 对比按钮
+        font_name = get_system_font()
         self.compare_btn = QPushButton("开 始 对 比")
         self.compare_btn.setFixedHeight(50)
-        self.compare_btn.setFont(QFont("Microsoft YaHei", 12, QFont.Weight.Bold))
+        self.compare_btn.setFont(QFont(font_name, 12, QFont.Weight.Bold))
         self.compare_btn.clicked.connect(self.start_compare)
         main_layout.addWidget(self.compare_btn, alignment=Qt.AlignmentFlag.AlignCenter)
         
@@ -286,10 +300,11 @@ class MainWindow(QMainWindow):
         file_layout = QHBoxLayout()
         file_layout.setSpacing(30)
         
+        font_name = get_system_font()
         # 原文档 X
         x_layout = QVBoxLayout()
         x_label = QLabel("原文档 (X)")
-        x_label.setFont(QFont("Microsoft YaHei", 10, QFont.Weight.Bold))
+        x_label.setFont(QFont(font_name, 10, QFont.Weight.Bold))
         x_layout.addWidget(x_label, alignment=Qt.AlignmentFlag.AlignCenter)
         
         self.btn_select_x = QPushButton("选择文件...")
@@ -307,7 +322,7 @@ class MainWindow(QMainWindow):
         # 修改文档 Y
         y_layout = QVBoxLayout()
         y_label = QLabel("修改文档 (Y)")
-        y_label.setFont(QFont("Microsoft YaHei", 10, QFont.Weight.Bold))
+        y_label.setFont(QFont(font_name, 10, QFont.Weight.Bold))
         y_layout.addWidget(y_label, alignment=Qt.AlignmentFlag.AlignCenter)
         
         self.btn_select_y = QPushButton("选择文件...")
@@ -353,7 +368,13 @@ class MainWindow(QMainWindow):
         self.label_save_path = QLabel("保存位置：")
         layout.addWidget(self.label_save_path)
         
-        self.edit_save_path = QLabel("C:\\Users\\...\\Documents\\合同对比结果_时间戳.docx")
+        # 跨平台路径显示
+        if platform.system() == "Windows":
+            default_path = "C:\\Users\\...\\Documents\\合同对比结果_时间戳.docx"
+        else:
+            default_path = "~/Documents/合同对比结果_时间戳.docx"
+        
+        self.edit_save_path = QLabel(default_path)
         self.edit_save_path.setStyleSheet("color: #333333;")
         layout.addWidget(self.edit_save_path, stretch=1)
         
@@ -370,6 +391,7 @@ class MainWindow(QMainWindow):
         group = QGroupBox("对比进度")
         layout = QVBoxLayout()
         
+        font_name = get_system_font()
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(0)
@@ -377,7 +399,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.progress_bar)
         
         self.label_progress_step = QLabel("准备中...")
-        self.label_progress_step.setFont(QFont("Microsoft YaHei", 10))
+        self.label_progress_step.setFont(QFont(font_name, 10))
         layout.addWidget(self.label_progress_step)
         
         # 进度详情
@@ -394,7 +416,7 @@ class MainWindow(QMainWindow):
         ]
         
         for _, label in self.steps:
-            label.setFont(QFont("Microsoft YaHei", 9))
+            label.setFont(QFont(font_name, 9))
             details_layout.addWidget(label)
         
         layout.addWidget(self.progress_details)
@@ -461,7 +483,9 @@ class MainWindow(QMainWindow):
             os.path.expanduser("~/Documents")
         )
         if path:
-            self.edit_save_path.setText(path + "\\合同对比结果_时间戳.docx")
+            # 跨平台路径分隔符
+            separator = "\\" if platform.system() == "Windows" else "/"
+            self.edit_save_path.setText(path + separator + "合同对比结果_时间戳.docx")
     
     def check_ready(self):
         """检查是否准备好对比"""
@@ -560,7 +584,20 @@ class MainWindow(QMainWindow):
         
         QMessageBox.information(self, "对比完成", msg)
         
+        # 自动打开结果文档
+        self._open_result_file(result['path'])
+        
         self.statusBar.showMessage(f"状态：对比完成，共发现 {total} 处改动")
+    
+    def _open_result_file(self, file_path):
+        """自动打开结果文件"""
+        try:
+            import subprocess
+            logger.info(f"正在打开结果文件：{file_path}")
+            subprocess.run(['open', file_path], check=True, capture_output=True)
+            logger.info("结果文件已打开")
+        except Exception as e:
+            logger.warning(f"自动打开文件失败：{e}")
     
     def on_error(self, error_msg):
         """处理错误"""
@@ -651,8 +688,9 @@ class MainWindow(QMainWindow):
     
     def show_about(self):
         """显示关于对话框"""
-        # 从 version.json 读取版本号
-        version = "1.0"
+        # 从 version.json 读取版本号和平台信息
+        version = "1.0.0"
+        platform_info = ""
         try:
             import json
             import os
@@ -662,15 +700,16 @@ class MainWindow(QMainWindow):
                 if os.path.exists(version_file):
                     with open(version_file, 'r', encoding='utf-8') as f:
                         data = json.load(f)
-                        version = data.get('version', '1.0')
+                        version = data.get('version', '1.0.0')
+                        platform_info = data.get('platform', 'macOS')
                     break
-                # 检查打包后环境
                 if hasattr(sys, '_MEIPASS'):
                     version_file = os.path.join(sys._MEIPASS, 'version.json')
                     if os.path.exists(version_file):
                         with open(version_file, 'r', encoding='utf-8') as f:
                             data = json.load(f)
-                            version = data.get('version', '1.0')
+                            version = data.get('version', '1.0.0')
+                            platform_info = data.get('platform', 'macOS')
                         break
         except Exception:
             pass
@@ -678,15 +717,15 @@ class MainWindow(QMainWindow):
         QMessageBox.about(
             self,
             "关于合同对比助手",
-            f"合同对比助手 v{version}\n\n"
+            f"合同对比助手 v{version}\n{platform_info} 版本\n\n"
             "一款专业的合同文档差异对比工具\n\n"
             "功能特点：\n"
             "• 自动识别文字增删改\n"
             "• 详细改动列表输出（第 X 段）\n"
             "• 生成 Excel 对比报告\n"
-            "• 支持 Word 和 PDF 格式\n"
+            "• 支持 Word (.docx) 和 PDF 格式\n"
             "• 日志记录与异常处理\n"
-            "• 自动更新检查\n\n"
+            "• 自动打开结果文档\n\n"
             "玉哥与他的虾\n"
             "版权所有 © 2026"
         )
